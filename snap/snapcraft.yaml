@@ -1,5 +1,5 @@
 name: gimp
-version: '2.8.22'
+version: '2.9.6'
 summary: GNU Image Manipulation Program
 description: |
   Whether you are a graphic designer, photographer, illustrator, or scientist,
@@ -12,29 +12,273 @@ icon: gimp.png
 
 apps:
   gimp:
-    command: desktop-launch env GIMP2_DATADIR="$SNAP/usr/share/gimp/2.0" GIMP2_LOCALEDIR="$SNAP/usr/share/gimp/2.0/locale" GIMP2_SYSCONFDIR="$SNAP/etc/gimp/2.0" GIMP2_PLUGINDIR="$SNAP/usr/lib/gimp/2.0" $SNAP/usr/bin/gimp
+    command: desktop-launch $SNAP/usr/bin/gimp-2.9
+    environment:
+      GIMP2_DATADIR: $SNAP/usr/share/gimp/2.0
+      GIMP2_LOCALEDIR: $SNAP/usr/share/gimp/2.0/locale
+      GIMP2_SYSCONFDIR: $SNAP/etc/gimp/2.0
+      GIMP2_PLUGINDIR: $SNAP/usr/lib/gimp/2.0
+      BABL_PATH: $SNAP/usr/lib/babl-0.1
+      GEGL_PATH: $SNAP/usr/lib/gegl-0.3  
     plugs: [gsettings, home, removable-media, unity7, opengl]
+  gegl:
+    command: desktop-launch gegl
+    environment:
+      BABL_PATH: $SNAP/usr/lib/babl-0.1
+      GEGL_PATH: $SNAP/usr/lib/gegl-0.3
+    plugs:
+      [home, removable-media, opengl]
 
 parts:
-  patches:
-    plugin: dump
-    source: snap/patches
-    prime: [-*]
-  gimp:
-    after: [patches, desktop-gtk2]
+  babl:
     plugin: autotools
-    source: git://git.gnome.org/gimp
-    source-tag: 'GIMP_2_8_22'
-    prepare: patch -p 1 < $SNAPCRAFT_STAGE/bump_Babl-GEGL_versions.patch
+    source: git://git.gnome.org/babl
+    source-tag: 'BABL_0_1_30'
+    source-depth: 1
     configflags:
-      - '--prefix=/usr'
-      - '--sysconfdir=/etc'
-      - '--enable-binreloc'
-    install: |
-      sed -i 's|^\(.*python=\).*|\1/snap/gimp/current/usr/bin/python|' $SNAPCRAFT_PART_INSTALL/usr/lib/gimp/2.0/interpreters/pygimp.interp
+      - --prefix=/usr
+      - --disable-docs
+    build-packages:
+      - gobject-introspection
+      - libgirepository1.0-dev
+    stage-packages:
+      - libgirepository-1.0-1
+    prime:
+      - -*.a
+      - usr/lib
+
+  gegl:
+    after: [babl, gexiv2, lcms2, libwebp]
+    plugin: autotools
+    source: git://git.gnome.org/gegl
+    source-tag: 'GEGL_0_3_20'
+    source-depth: 1
+    configflags:
+      - --prefix=/usr
+      - --disable-docs
     build-packages:
       - gettext
+      - gobject-introspection
+      - graphviz
+      - libavcodec-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libcairo2-dev
+      - libexiv2-dev
+      - libgdk-pixbuf2.0-dev
+      - libgirepository1.0-dev      
+      - libglib2.0-dev
+      - libgraphviz-dev
+      - libgtk2.0-dev
+      - libjpeg8-dev
+      - libjson-glib-dev
+      - liblensfun-dev
+      - libopenexr-dev
+      - libraw-dev
+      - libpango1.0-dev
+      - librsvg2-dev
+      - libsdl1.2-dev
+      - libspiro-dev
+      - libssh-gcrypt-dev
+      - libsuitesparse-dev
+      - libswscale-dev
+      - libtiff5-dev
+      - libv4l-dev
+      - python-gi-dev
+      - valac
+    stage-packages:
+      - graphviz
+      - libamd2.4.1
+      - libbtf1.2.1
+      - libavcodec-ffmpeg56
+      - libavformat-ffmpeg56
+      - libavutil-ffmpeg54
+      - libcamd2.4.1
+      - libccolamd2.9.1
+      - libcholmod3.0.6
+      - libcolamd2.9.1
+      - libcsparse3.1.4
+      - libcxsparse3.1.4
+      - libexiv2-14
+      - libglib2.0-0
+      - libgirepository-1.0-1
+      - libgtk2.0-0
+      - libjpeg8
+      - libklu1.3.3
+      - libldl2.2.1
+      - liblensfun0
+      - libopenexr22
+      - libraw15
+      - librsvg2-2
+      - libsdl1.2debian
+      - libspiro0
+      - libspqr2.0.2
+      - libssh-gcrypt-4
+      - libswscale-ffmpeg3
+      - libtiff5
+      - libumfpack5.7.1
+      - libv4l-0
+      - python-gi
+      - python3-gi
+    stage:
+      - -usr/lib/**/glib-2.0/gio-querymodules
+      - -usr/lib/**/glib-2.0/glib-compile-resources
+      - -usr/lib/**/glib-2.0/glib-compile-schemas
+      - -usr/share/doc
+      - -usr/share/lintian
+    prime:
+      - -*.a
+      - usr/bin
+      - usr/lib
+      - usr/share/gir-1.0/Gegl*
+      - usr/share/graphviz
+      - usr/share/lensfun
+      - usr/share/locale/**/gegl*
+  
+  gexiv2:
+    plugin: autotools
+    source: git://git.gnome.org/gexiv2
+    source-tag: 'gexiv2-0.10.6'
+    source-depth: 1
+    configflags:
+      - --prefix=/usr
+      - --disable-gtk-doc
+      - --disable-gtk-doc-html
+      - --disable-gtk-doc-pdf
+    build-packages:
+      - gobject-introspection
+      - gtk-doc-tools
+      - libexiv2-dev
+      - libgirepository1.0-dev
+      - libglib2.0-dev
+      - python-gi-dev
+      - valac
+    stage-packages:
+      - libexiv2-14
+      - libgirepository-1.0-1
+      - python-gi
+      - python3-gi
+    prime:
+      - -*.a
+      - usr/bin
+      - usr/lib
+
+  jasper:
+    plugin: cmake
+    source: https://www.ece.uvic.ca/~frodo/jasper/software/jasper-2.0.12.tar.gz
+    configflags:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_BUILD_TYPE=release
+      - -DJAS_ENABLE_LIBJPEG=true
+      - -DJAS_ENABLE_OPENGL=true
+    build-packages:
+      - libgl1-mesa-dev
+      - libjpeg8-dev
+    stage-packages:
+      - libgl1-mesa-glx
+      - libjpeg8
+    prime:
+      - -*.a
+      - usr/lib
+
+  libpng:
+    plugin: autotools
+    source: ftp://ftp-osl.osuosl.org/pub/libpng/src/libpng16/libpng-1.6.32.tar.xz
+    configflags:
+      - --prefix=/usr
+    build-packages:
+      - zlib1g-dev
+    prime:
+      - -*.a
+      - usr/lib
+  
+  libwebp:
+    plugin: autotools
+    source: https://chromium.googlesource.com/webm/libwebp.git
+    source-type: git
+    source-tag: v0.6.0
+    source-depth: 1
+    configflags:
+      - --prefix=/usr
+      - --enable-libwebpmux
+      - --enable-libwebpdemux
+      - --enable-libwebpdecoder
+    prime:
+      - -*.a
+      - usr/bin
+      - usr/lib
+  
+  libmypaint:
+    plugin: autotools
+    source: https://github.com/mypaint/libmypaint/releases/download/v1.3.0/libmypaint-1.3.0.tar.xz
+    configflags:
+      - --prefix=/usr
+    build-packages:
+      - gettext
+      - gobject-introspection
+      - intltool
+      - libglib2.0-dev
+      - libjson-c-dev
+      - python
+      - python3
+    stage-packages:
+      - libgirepository-1.0-1
+      - libjson-glib-1.0-0
+    stage:
+      - -usr/lib/**/glib-2.0/gio-querymodules
+      - -usr/lib/**/glib-2.0/glib-compile-resources
+      - -usr/lib/**/glib-2.0/glib-compile-schemas
+      - -usr/share/doc
+      - -usr/share/lintian
+    prime:
+      - -*.a
+      - usr/lib
+      - usr/share/locale/**/libmypaint*
+  
+  lcms2:
+    plugin: autotools
+    source: https://github.com/mm2/Little-CMS/archive/lcms2.8.tar.gz
+    configflags:
+      - --prefix=/usr
+    build-packages:
+      - libjpeg8-dev
+      - libtiff5-dev
+      - zlib1g-dev
+    stage-packages:
+      - libjpeg8
+      - libtiff5
+    prime:
+      - -*.a
+      - usr/lib
+
+  gimp:
+    after: 
+      - desktop-glib-only
+      - babl
+      - gegl
+      - gexiv2
+      - jasper
+      - lcms2
+      - libmypaint
+      - libpng
+      - libwebp
+    plugin: autotools
+    source: git://git.gnome.org/gimp
+    source-tag: 'GIMP_2_9_6'
+    source-depth: 1
+    build: |
+      export BABL_PATH="$SNAPCRAFT_STAGE/usr/lib/babl-0.1"
+      export GEGL_PATH="$SNAPCRAFT_STAGE/usr/lib/gegl-0.3"
+      env NOCONFIGURE=1 ./autogen.sh
+      ./configure --prefix=/usr --sysconfdir=/etc --enable-binreloc
+      make && make DESTDIR=$SNAPCRAFT_PART_INSTALL install
+    install: |
+      sed -i 's|^\(.*python=\).*|\1/snap/gimp/current/usr/bin/python|' $SNAPCRAFT_PART_INSTALL/usr/lib/gimp/2.0/interpreters/pygimp.interp || true
+    build-packages:
+      - gettext
+      - glib-networking
       - gnome-pkg-tools
+      - gobject-introspection
       - gtk-doc-tools
       - intltool
       - iso-codes
@@ -42,57 +286,85 @@ parts:
       - libart-2.0-dev
       - libasound2-dev
       - libatk1.0-dev
-      - libbabl-dev
       - libbz2-dev
       - libcurl4-openssl-dev
       - libexif-dev
       - libfreetype6-dev
       - libfontconfig1-dev
-      - libgegl-dev
       - libgs-dev
       - libgudev-1.0-dev
+      - libharfbuzz-dev
       - libice-dev
-      - libjasper-dev
       - libjpeg8-dev
-      - liblcms2-dev
+      - liblzma-dev
       - libmng-dev
-      - libpng12-dev
+      - libpango1.0-dev
+      - libpoppler-dev
       - libpoppler-glib-dev
       - librsvg2-dev
       - libsm-dev
       - libtiff5-dev
+      - libwebkit2gtk-4.0-dev
       - libwmf-dev
       - libxpm-dev
-      - zlib1g-dev
       - patchutils
+      - python-cairo-dev
       - python-dev
+      - python2.7-dev
+      - python3-dev
       - python-gtk2-dev
       - xsltproc
+      - zlib1g-dev
     stage-packages:
+      - darktable
+      - glib-networking
       - libaa1
       - libart-2.0-2
-      - libasound2
-      - libbabl-0.1-0
       - libbz2-1.0
       - libcurl3
       - libexif12
       - libfreetype6
       - libfontconfig1
-      - libgegl-0.3-0
+      - libgirepository-1.0-1
       - libgs9
       - libgudev-1.0-0
+      - libharfbuzz0b
       - libice6
-      - libjasper1
       - libjpeg8
-      - liblcms2-2
+      - liblzma5
       - libmng2
-      - libpng12-0
+      - libpangocairo-1.0-0
+      - libpoppler58
+      - libpoppler-glib8
       - librsvg2-2
       - libsm6
       - libtiff5
+      - libwebkit2gtk-4.0-37-gtk2
       - libwmf0.2-7
       - libxpm4
-      - zlib1g
-      - python
+      - poppler-data
+      - python-cairo
       - python-dev
-      - python-gtk2
+      - python2.7-dev
+      - python3-dev
+      - xdg-utils
+    prime:
+      - -*.a
+    #   - etc/fontconfig
+    #   - usr/bin
+    #   - usr/lib
+    #   - usr/share/appdata/darktable*.xml
+    #   - usr/share/appdata/gimp*.xml
+    #   - usr/share/applications/darktable.desktop
+    #   - usr/share/applications/gimp.desktop
+    #   - usr/share/darktable
+    #   - usr/share/ghostscript
+    #   - usr/share/gimp
+    #   - usr/share/glib-2.0
+    #   - usr/share/icons/**/darktable*
+    #   - usr/share/icons/**/gimp*
+    #   - usr/share/lensfun
+    #   - usr/share/libgphoto2
+    #   - usr/share/locale/**/darktable*
+    #   - usr/share/locale/**/gimp20*
+    #   - usr/share/poppler
