@@ -12,16 +12,29 @@ icon: gimp.png
 
 apps:
   gimp:
-    command: desktop-launch env GIMP2_DATADIR="$SNAP/usr/share/gimp/2.0" GIMP2_LOCALEDIR="$SNAP/usr/share/gimp/2.0/locale" GIMP2_SYSCONFDIR="$SNAP/etc/gimp/2.0" GIMP2_PLUGINDIR="$SNAP/usr/lib/gimp/2.0" $SNAP/usr/bin/gimp
-    plugs: [gsettings, home, removable-media, unity7, opengl]
+    command: desktop-launch $SNAP/usr/bin/gimp
+    plugs:
+      - desktop
+      - gsettings
+      - home
+      - opengl
+      - removable-media
+      - unity7
+      - wayland
+      - x11
     environment:
       GEGL_PATH: $SNAP/usr/lib/gegl-0.2
+      GIMP2_DATADIR: $SNAP/usr/share/gimp/2.0
+      GIMP2_LOCALEDIR: $SNAP/usr/share/gimp/2.0/locale
+      GIMP2_SYSCONFDIR: $SNAP/etc/gimp/2.0
+      GIMP2_PLUGINDIR: $SNAP/usr/lib/gimp/2.0
 
 parts:
   gegl:
     plugin: autotools
     source: git://git.gnome.org/gegl
     source-tag: 'GEGL_0_2_0'
+    source-depth: 1
     configflags:
       - 'LDFLAGS=-lm'
       - '--prefix=/usr'
@@ -33,6 +46,7 @@ parts:
       - libc6-dev
       - libcairo2-dev
       - libexiv2-dev
+      - libfftw3-dev
       - libgdk-pixbuf2.0-dev
       - libglib2.0-dev
       - libgraphviz-dev
@@ -55,6 +69,10 @@ parts:
       - libcdt5
       - libcgraph6
       - libexiv2-14
+      - libfftw3-double3
+      - libfftw3-long3
+      - libfftw3-quad3
+      - libfftw3-single3
       - libgdk-pixbuf2.0-0
       - libglib2.0-0
       - libgvc6
@@ -79,6 +97,7 @@ parts:
     plugin: autotools
     source: git://git.gnome.org/gimp
     source-tag: 'GIMP_2_8_22'
+    source-depth: 1
     configflags:
       - '--prefix=/usr'
       - '--sysconfdir=/etc'
@@ -99,8 +118,9 @@ parts:
       - libbz2-dev
       - libcurl4-openssl-dev
       - libexif-dev
-      - libfreetype6-dev
+      - libfftw3-dev
       - libfontconfig1-dev
+      - libfreetype6-dev
       - libgs-dev
       - libgudev-1.0-dev
       - libice-dev
@@ -115,11 +135,11 @@ parts:
       - libtiff5-dev
       - libwmf-dev
       - libxpm-dev
-      - zlib1g-dev
       - patchutils
       - python-dev
       - python-gtk2-dev
       - xsltproc
+      - zlib1g-dev
     stage-packages:
       - libaa1
       - libart-2.0-2
@@ -128,8 +148,12 @@ parts:
       - libbz2-1.0
       - libcurl3
       - libexif12
-      - libfreetype6
+      - libfftw3-double3
+      - libfftw3-long3
+      - libfftw3-quad3
+      - libfftw3-single3
       - libfontconfig1
+      - libfreetype6
       - libgs9
       - libgudev-1.0-0
       - libice6
@@ -143,7 +167,8 @@ parts:
       - libtiff5
       - libwmf0.2-7
       - libxpm4
-      - zlib1g
+      - locales-all
       - python
       - python-dev
       - python-gtk2
+      - zlib1g
