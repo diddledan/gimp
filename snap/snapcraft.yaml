@@ -19,7 +19,7 @@ apps:
       GIMP2_SYSCONFDIR: $SNAP/etc/gimp/2.0
       GIMP2_PLUGINDIR: $SNAP/usr/lib/gimp/2.0
       BABL_PATH: $SNAP/usr/lib/babl-0.1
-      GEGL_PATH: $SNAP/usr/lib/gegl-0.3  
+      GEGL_PATH: $SNAP/usr/lib/gegl-0.3
     plugs: [gsettings, home, removable-media, unity7, opengl]
   gegl:
     command: desktop-launch gegl
@@ -65,8 +65,9 @@ parts:
       - libavutil-dev
       - libcairo2-dev
       - libexiv2-dev
+      - libfftw3-dev
       - libgdk-pixbuf2.0-dev
-      - libgirepository1.0-dev      
+      - libgirepository1.0-dev
       - libglib2.0-dev
       - libgraphviz-dev
       - libgtk2.0-dev
@@ -134,7 +135,7 @@ parts:
       - usr/share/graphviz
       - usr/share/lensfun
       - usr/share/locale/**/gegl*
-  
+
   gexiv2:
     plugin: autotools
     source: git://git.gnome.org/gexiv2
@@ -191,7 +192,7 @@ parts:
     prime:
       - -*.a
       - usr/lib
-  
+
   libwebp:
     plugin: autotools
     source: https://chromium.googlesource.com/webm/libwebp.git
@@ -207,7 +208,7 @@ parts:
       - -*.a
       - usr/bin
       - usr/lib
-  
+
   libmypaint:
     plugin: autotools
     source: https://github.com/mypaint/libmypaint/releases/download/v1.3.0/libmypaint-1.3.0.tar.xz
@@ -234,7 +235,7 @@ parts:
       - -*.a
       - usr/lib
       - usr/share/locale/**/libmypaint*
-  
+
   lcms2:
     plugin: autotools
     source: https://github.com/mm2/Little-CMS/archive/lcms2.8.tar.gz
@@ -252,7 +253,7 @@ parts:
       - usr/lib
 
   gimp:
-    after: 
+    after:
       - desktop-glib-only
       - babl
       - gegl
@@ -289,8 +290,9 @@ parts:
       - libbz2-dev
       - libcurl4-openssl-dev
       - libexif-dev
-      - libfreetype6-dev
+      - libfftw3-dev
       - libfontconfig1-dev
+      - libfreetype6-dev
       - libgs-dev
       - libgudev-1.0-dev
       - libharfbuzz-dev
@@ -323,7 +325,10 @@ parts:
       - libbz2-1.0
       - libcurl3
       - libexif12
-      - libfreetype6
+      - libfftw3-double3
+      - libfftw3-long3
+      - libfftw3-quad3
+      - libfftw3-single3
       - libfontconfig1
       - libgirepository-1.0-1
       - libgs9
