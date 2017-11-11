@@ -20,7 +20,14 @@ apps:
       GIMP2_PLUGINDIR: $SNAP/usr/lib/gimp/2.0
       BABL_PATH: $SNAP/usr/lib/babl-0.1
       GEGL_PATH: $SNAP/usr/lib/gegl-0.3
-    plugs: [gsettings, home, removable-media, unity7, opengl]
+    plugs:
+      - desktop
+      - home
+      - opengl
+      - removable-media
+      - wayland
+      - x11
+      - gsettings
   gegl:
     command: desktop-launch gegl
     environment:
@@ -184,7 +191,7 @@ parts:
 
   libpng:
     plugin: autotools
-    source: ftp://ftp-osl.osuosl.org/pub/libpng/src/libpng16/libpng-1.6.32.tar.xz
+    source: ftp://ftp-osl.osuosl.org/pub/libpng/src/libpng16/libpng-1.6.34.tar.xz
     configflags:
       - --prefix=/usr
     build-packages:
@@ -271,9 +278,10 @@ parts:
       export BABL_PATH="$SNAPCRAFT_STAGE/usr/lib/babl-0.1"
       export GEGL_PATH="$SNAPCRAFT_STAGE/usr/lib/gegl-0.3"
       env NOCONFIGURE=1 ./autogen.sh
-      ./configure --prefix=/usr --sysconfdir=/etc --enable-binreloc
-      make && make DESTDIR=$SNAPCRAFT_PART_INSTALL install
+      env PYTHON=/usr/bin/python2.7 ./configure --prefix=/usr --sysconfdir=/etc --enable-binreloc
+      make
     install: |
+      make DESTDIR=$SNAPCRAFT_PART_INSTALL install
       sed -i 's|^\(.*python=\).*|\1/snap/gimp/current/usr/bin/python|' $SNAPCRAFT_PART_INSTALL/usr/lib/gimp/2.0/interpreters/pygimp.interp || true
     build-packages:
       - gettext
@@ -352,6 +360,7 @@ parts:
       - python-dev
       - python2.7-dev
       - python3-dev
+      - python-gtk2
       - xdg-utils
     prime:
       - -*.a
